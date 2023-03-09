@@ -242,7 +242,7 @@ class ApproxNumpy(ApproxBase):
                 yield actual[i].item(), self.expected[i].item()
 
 
-class ApproxMapping(ApproxBase):
+class ApproxMapping(ApproxBase, dict):
     """Perform approximate comparisons where the expected value is a mapping
     with numeric values (the keys can be anything)."""
 
@@ -314,6 +314,13 @@ class ApproxMapping(ApproxBase):
             if isinstance(value, type(self.expected)):
                 msg = "pytest.approx() does not support nested dictionaries: key={!r} value={!r}\n  full mapping={}"
                 raise TypeError(msg.format(key, value, pprint.pformat(self.expected)))
+
+    def __getitem__(self, key):
+        return approx(
+            self.expected[key],
+            rel=self.rel,
+            abs=self.abs,
+            nan_ok=self.nan_ok)
 
 
 class ApproxSequenceLike(ApproxBase):
